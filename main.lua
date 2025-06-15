@@ -51,10 +51,42 @@ function love.update(dt)
          py = math.max(py - playerSpeed * dt, 5)
       end
    end
+
+   updateBullets(dt)
+end
+
+function updateBullets(dt)
+   for i = #bullets, 1, -1 do
+      local b = bullets[i]
+      b.x = b.x + b.dx * dt
+      b.y = b.y + b.dy * dt
+
+      if b.x < 0 or b.x > worldWidth or b.y < 0 or b.y > worldHeight then
+         table.remove(bullets, i)
+      end
+   end
+end
+
+function drawBullets(offsetX, offsetY)
+   offsetX = offsetX or 0
+   offsetY = offsetY or 0
+
+   love.graphics.setColor(1, 1, 0)
+   for _, b in ipairs(bullets) do
+      love.graphics.circle("fill", b.x - offsetX, b.y - offsetY, b.radius)
+   end
+   love.graphics.setColor(1, 1, 1)
+end
+
+function love.keypressed(key, scancode, isrepeat)
+   if key == "up" then
+      shootBullet(px+sx, py+sy, 0)
+   end
 end
 
 function love.draw()
+   love.window.setPosition(sx, sy, 1)
    love.graphics.clear()
    love.graphics.rectangle("fill", px - 5, py - 5, ps, ps)
-   love.window.setPosition(sx, sy, 1)
+   drawBullets(sx, sy)
 end
