@@ -3,11 +3,13 @@ require("bullet")
 
 -- STATS --
 width, height = 200, 200
-speed = 100
-shotSpread = 15
-turnSpeed = 1
-fireCooldown = 0.5
-fireTimer = nil
+speed = 35
+turnMultiplier = 1
+bulletSize = 4
+bulletDamage = 200
+bulletSpeed = 100
+bulletSpread = 15
+fireCooldown = 0.75
 
 -- config --
 worldWidth, worldHeight = love.window.getDesktopDimensions(1)
@@ -16,11 +18,13 @@ sx, sy = 0, 0
 px, py = width / 2, height / 2
 ps = 10
 d = nil
+fireTimer = nil
 
 function love.load()
    love.window.setMode(width, height, {borderless = true})
    love.window.setPosition(sx, sy, 1)
    love.graphics.setColor(1, 1, 1)
+
    fireTimer = 0
    d = 0
 end
@@ -35,7 +39,7 @@ function love.update(dt)
       love.event.push('quit')
    end
 
-    if love.keyboard.isDown("d") then
+   if love.keyboard.isDown("d") then
       if math.abs(px - centerX-5) <= margin and sx + width < worldWidth then
          sx = math.min(sx + speed * dt, worldWidth - width)
       elseif px < width - 5 then
@@ -64,16 +68,16 @@ function love.update(dt)
    end
 
    if love.keyboard.isDown("right") then
-      d = d + 100 * turnSpeed * dt
+      d = d + 100 * turnMultiplier * dt
    end
 
    if love.keyboard.isDown("left") then
-      d = d - 100 * turnSpeed * dt
+      d = d - 100 * turnMultiplier * dt
    end
 
    fireTimer = fireTimer + dt
    if love.keyboard.isDown("up") and fireTimer >= fireCooldown then
-      shootBullet(px + sx, py + sy, d + (love.math.random() * 2 * shotSpread - shotSpread))
+      shootBullet(px + sx, py + sy, d + (love.math.random() * 2 * bulletSpread - bulletSpread), false, bulletSpeed, bulletDamage, bulletSize)
       fireTimer = 0
    end
    
@@ -109,10 +113,9 @@ function love.draw()
    love.graphics.setColor(1, 1, 0)
    love.graphics.arc(
       'line', 'pie', px, py, 20,
-      math.rad(d - shotSpread), math.rad(d + shotSpread),
+      math.rad(d - bulletSpread), math.rad(d + bulletSpread),
       4
    ) 
    love.graphics.setColor(1, 1, 1)
-   print(math.floor(d-15) .. " " .. math.floor(d+15))
    drawBullets(sx, sy)
 end
