@@ -1,24 +1,35 @@
+io.stdout:setvbuf("no")
 require("bullet")
 
+-- STATS --
 width, height = 200, 200
-worldWidth, worldHeight = love.window.getDesktopDimensions(1)
 speed = 100
-playerSpeed = 100
-margin = 5
+shotSpread = 15
+turnSpeed = 1
+fireCooldown = 0.5
+fireTimer = nil
 
+-- config --
+worldWidth, worldHeight = love.window.getDesktopDimensions(1)
+margin = 5
 sx, sy = 0, 0
 px, py = width / 2, height / 2
 ps = 10
+d = nil
 
 function love.load()
    love.window.setMode(width, height, {borderless = true})
    love.window.setPosition(sx, sy, 1)
    love.graphics.setColor(1, 1, 1)
+   fireTimer = 0
+   d = 0
 end
 
 function love.update(dt)
-   local centerX = width / 2
-   local centerY = height / 2
+   local centerX = math.floor(width / 2)
+   local centerY = math.floor(height / 2)
+
+   love.window.setPosition(sx, sy, 1)
 
    if love.keyboard.isDown("escape") then
       love.event.push('quit')
@@ -28,13 +39,13 @@ function love.update(dt)
       if math.abs(px - centerX-5) <= margin and sx + width < worldWidth then
          sx = math.min(sx + speed * dt, worldWidth - width)
       elseif px < width - 5 then
-         px = math.min(px + playerSpeed * dt, width - 5)
+         px = math.min(px + speed * dt, width - 5)
       end
    elseif love.keyboard.isDown("a") then
       if math.abs(px - centerX) <= margin and sx > 0 then
          sx = math.max(sx - speed * dt, 0)
       elseif px > 5 then
-         px = math.max(px - playerSpeed * dt, 5)
+         px = math.max(px - speed * dt, 5)
       end
    end
 
@@ -42,16 +53,30 @@ function love.update(dt)
       if math.abs(py - centerY-5) <= margin and sy + height < worldHeight then
          sy = math.min(sy + speed * dt, worldHeight - height)
       elseif py < height - 5 then
-         py = math.min(py + playerSpeed * dt, height - 5)
+         py = math.min(py + speed * dt, height - 5)
       end
    elseif love.keyboard.isDown("w") then
       if math.abs(py - centerY) <= margin and sy > 0 then
          sy = math.max(sy - speed * dt, 0)
       elseif py > 5 then
-         py = math.max(py - playerSpeed * dt, 5)
+         py = math.max(py - speed * dt, 5)
       end
    end
 
+   if love.keyboard.isDown("right") then
+      d = d + 100 * turnSpeed * dt
+   end
+
+   if love.keyboard.isDown("left") then
+      d = d - 100 * turnSpeed * dt
+   end
+
+   fireTimer = fireTimer + dt
+   if love.keyboard.isDown("up") and fireTimer >= fireCooldown then
+      shootBullet(px + sx, py + sy, d + (love.math.random() * 2 * shotSpread - shotSpread))
+      fireTimer = 0
+   end
+   
    updateBullets(dt)
 end
 
@@ -78,15 +103,16 @@ function drawBullets(offsetX, offsetY)
    love.graphics.setColor(1, 1, 1)
 end
 
-function love.keypressed(key, scancode, isrepeat)
-   if key == "up" then
-      shootBullet(px+sx, py+sy, 0)
-   end
-end
-
 function love.draw()
-   love.window.setPosition(sx, sy, 1)
    love.graphics.clear()
    love.graphics.rectangle("fill", px - 5, py - 5, ps, ps)
+   love.graphics.setColor(1, 1, 0)
+   love.graphics.arc(
+      'line', 'pie', px, py, 20,
+      math.rad(d - shotSpread), math.rad(d + shotSpread),
+      4
+   ) 
+   love.graphics.setColor(1, 1, 1)
+   print(math.floor(d-15) .. " " .. math.floor(d+15))
    drawBullets(sx, sy)
 end
