@@ -7,7 +7,7 @@ function spawnEnemy(x, y)
     local enemy = {
         x = x,
         y = y,
-        radius = 8,
+        radius = 9,
         health = 1000,
         fireTimer = 0
     }
@@ -27,12 +27,14 @@ function drawEnemies(dt)
 
         local e = enemies[i]
         love.graphics.setColor(1, 0, 0)
-        love.graphics.circle("fill", e.x - sx, e.y - sy, e.radius)
+        love.graphics.circle("fill", e.x - math.floor(sx), e.y - math.floor(sy), e.radius)
         e.fireTimer = e.fireTimer + dt
         if e.fireTimer >= 0.5 then
-            shootBullet(e.x, e.y, love.math.random(0, 360), true, bulletSpeed, bulletDamage, bulletSize)
+            shootBullet(e.x, e.y, love.math.random(0, 360), true, 100, 200, 4)
             e.fireTimer = 0
         end
+
+        drawEnemyHealthbar(e.x, e.y-e.radius-7, e.health)
         ::continue::
     end
 end

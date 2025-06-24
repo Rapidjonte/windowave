@@ -3,6 +3,7 @@ io.stdout:setvbuf("no")
 require("bullet")
 require("enemy")
 require("stats")
+require("healthbar")
 
 local debugPrint = false
 
@@ -34,7 +35,7 @@ function love.update(dt)
    if love.keyboard.isDown("escape") then
       love.event.push('quit')
    end
-
+   
    if love.keyboard.isDown("d") then
       if math.abs(px - centerX-5) <= margin and sx + width < worldWidth then
          sx = math.min(sx + speed * dt, worldWidth - width)
@@ -100,8 +101,9 @@ function love.draw()
    love.graphics.rectangle("fill", px - 5, py - 5, ps, ps)
    love.graphics.setColor(1, 1, 0)
    love.graphics.arc('line', 'pie', px, py, 20, math.rad(d - bulletSpread), math.rad(d + bulletSpread), 4)
-   drawBullets(sx, sy)
+   drawBullets(math.floor(sx), math.floor(sy))
    drawEnemies(delta)
+   drawPlayerHealthbar(px, py-12, health)
 
    if debugPrint then
       love.graphics.setColor(0, 1, 0)

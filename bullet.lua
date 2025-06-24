@@ -6,21 +6,15 @@ local function deg2rad(deg)
     return deg * math.pi / 180
 end
 
-function shootBullet(x, y, _dir, _enemyBullet)
+function shootBullet(x, y, _dir, _enemyBullet, _speed, _damage, _radius)
     local dir = deg2rad(_dir)
-    local _damage = bulletDamage
-    if _enemyBullet then
-        _damage = 100
-    end
-
-    local speed = bulletSpeed
 
     local bullet = {
         x = x,
         y = y,
-        dx = math.cos(dir) * speed,
-        dy = math.sin(dir) * speed,
-        radius = bulletSize,
+        dx = math.cos(dir) * _speed,
+        dy = math.sin(dir) * _speed,
+        radius = _radius,
         enemyBullet = _enemyBullet,
         damage = _damage
     }
@@ -38,10 +32,10 @@ function updateBullets(dt)
             table.remove(bullets, i)
         else
             if b.enemyBullet then
-                local playerL = px + sx - 5
-                local playerR = px + sx + 5
-                local playerT = py + sy - 5
-                local playerB = py + sy + 5
+                local playerL = px + math.floor(sx) - 5
+                local playerR = px + math.floor(sx) + 5
+                local playerT = py + math.floor(sy) - 5
+                local playerB = py + math.floor(sy) + 5
 
                 local bulletL = b.x - b.radius
                 local bulletR = b.x + b.radius
