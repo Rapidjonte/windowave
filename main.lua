@@ -1,7 +1,10 @@
 io.stdout:setvbuf("no")
+
 require("bullet")
 require("enemy")
 require("stats")
+
+local debugPrint = false
 
 -- config --
 worldWidth, worldHeight = love.window.getDesktopDimensions(1)
@@ -72,7 +75,6 @@ function love.update(dt)
    if love.keyboard.isDown("right") then
       d = d + 100 * turnMultiplier * dt
    end
-
    if love.keyboard.isDown("left") then
       d = d - 100 * turnMultiplier * dt
    end
@@ -86,6 +88,12 @@ function love.update(dt)
    updateBullets(dt)
 end
 
+function love.keypressed(key, scancode, isrepeat)
+   if key == "f3" then
+      debugPrint = not debugPrint
+   end
+end
+
 function love.draw()
    love.graphics.clear()
    love.graphics.setColor(1, 1, 1)
@@ -95,12 +103,14 @@ function love.draw()
    drawBullets(sx, sy)
    drawEnemies(delta)
 
-   -- DEBUG PRINT --
-   love.graphics.setColor(0, 1, 0)
-   love.graphics.print("FPS: " .. love.timer.getFPS(), 0, 0)
-   love.graphics.print("E: " .. #enemies, 0, 20)
-   love.graphics.print("B: " .. #bullets, 0, 30)
-   love.graphics.print("X: " .. px, 0, 50)
-   love.graphics.print("Y: " .. py, 0, 60)
-   love.graphics.print("R: " .. d, 0, 70)
+   if debugPrint then
+      love.graphics.setColor(0, 1, 0)
+      love.graphics.print("FPS: " .. love.timer.getFPS(), 0, 0)
+      love.graphics.print("E: " .. #enemies, 0, 20)
+      love.graphics.print("B: " .. #bullets, 0, 30)
+      love.graphics.print("X: " .. px, 0, 50)
+      love.graphics.print("Y: " .. py, 0, 60)
+      love.graphics.print("R: " .. d, 0, 70)
+      love.graphics.print("HP: " .. health, 0, 90)
+   end
 end

@@ -1,5 +1,6 @@
 width, height = 200, 200
 speed = 40
+health = 1000
 turnMultiplier = 1
 bulletSize = 4
 bulletDamage = 200
