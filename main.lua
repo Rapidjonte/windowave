@@ -4,7 +4,14 @@ require("bullet")
 require("enemy")
 require("stats")
 require("healthbar")
-require("showtext")
+require("show_text")
+
+local EnemyIndicator = require("enemy_indicator")
+
+function love.draw()
+    -- draw player, enemies, etc...
+    EnemyIndicator.drawIndicators(enemies, cameraX, cameraY, width, height, px + cameraX, py + cameraY)
+end
 
 local debugPrint = false
 
@@ -110,6 +117,7 @@ function love.draw()
    drawEnemies(delta) -- updates too
    drawText(delta) -- updates too
    drawPlayerHealthbar(px, py-12, health)
+   EnemyIndicator.drawIndicators(enemies, sx, sy, width, height, px + sx, py + sy)
 
    -- draw xp bar --
    love.graphics.setColor(1, 1, 1)
