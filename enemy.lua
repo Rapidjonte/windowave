@@ -4,11 +4,22 @@ require("stats")
 require("bullet")
 
 function spawnEnemy(x, y)
+    local minR = 7
+    local maxR = 20
+
+    if (math.random(0, 100) < bigChance) then
+        maxR = 50
+    end
+
+    local _radius = math.random(minR, maxR)
+    local _health = math.floor(math.pi * _radius^2 * 2)
+
     local enemy = {
         x = x,
         y = y,
-        radius = 9,
-        health = 1000,
+        radius = _radius,
+        health = _health,
+        startHealth = _health,
         fireTimer = 0
     }
   
@@ -16,16 +27,26 @@ function spawnEnemy(x, y)
 end
 
 function drawEnemies(dt)
+    while #enemies < enemyCap do
+        spawnEnemy(love.math.random(0,worldWidth),love.math.random(0,worldHeight))
+    end
+
     for i = #enemies, 1, -1 do
-        if bulletCheck(enemies[i]) then
-            enemies[i].health = enemies[i].health - bulletDamage
-            if enemies[i].health <= 0 then
+        local e = enemies[i]
+
+        if bulletCheck(e) then
+            e.health = e.health - bulletDamage
+            if e.health <= 0 then
+                local xpGain = math.floor(e.startHealth/300)
+                local textSize = math.min(30,math.floor(e.radius * 1.5))
+                showText("+" .. xpGain .. " XP", e.x, e.y, 1000, {0, 1, 1}, textSize)
+                xp = xp + xpGain * xpMult
+                checkLvlUp()
                 table.remove(enemies, i)
                 goto continue
             end
         end
 
-        local e = enemies[i]
         love.graphics.setColor(1, 0, 0)
         love.graphics.circle("fill", e.x - math.floor(sx), e.y - math.floor(sy), e.radius)
         e.fireTimer = e.fireTimer + dt
@@ -34,7 +55,7 @@ function drawEnemies(dt)
             e.fireTimer = 0
         end
 
-        drawEnemyHealthbar(e.x, e.y-e.radius-7, e.health)
+        drawEnemyHealthbar(e.x, e.y-e.radius-7, e.health, e.radius, e.startHealth)
         ::continue::
     end
 end
@@ -51,9 +72,8 @@ function bulletCheck(e)
             if dist < (b.radius + e.radius) then
                 table.remove(bullets, i)
                 return true
-            else
-                return false
             end
         end
     end
+    return false
 end

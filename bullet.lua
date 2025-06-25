@@ -16,8 +16,13 @@ function shootBullet(x, y, _dir, _enemyBullet, _speed, _damage, _radius)
         dy = math.sin(dir) * _speed,
         radius = _radius,
         enemyBullet = _enemyBullet,
-        damage = _damage
+        damage = _damage,
+        m = 2.5 + _radius / _speed
     }
+
+    if not _enemyBullet then
+        bullet.m = bulletLifespan
+    end
 
     table.insert(bullets, bullet)
 end
@@ -25,10 +30,12 @@ end
 function updateBullets(dt)
     for i = #bullets, 1, -1 do
         local b = bullets[i]
+
         b.x = b.x + b.dx * dt
         b.y = b.y + b.dy * dt
+        b.m = b.m - dt
 
-        if b.x < 0 or b.x > worldWidth or b.y < 0 or b.y > worldHeight then
+        if b.x < 0 or b.x > worldWidth or b.y < 0 or b.y > worldHeight or b.m <= 0 then
             table.remove(bullets, i)
         else
             if b.enemyBullet then

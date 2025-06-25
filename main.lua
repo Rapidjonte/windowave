@@ -4,38 +4,28 @@ require("bullet")
 require("enemy")
 require("stats")
 require("healthbar")
+require("showtext")
 
 local debugPrint = false
-
--- config --
-worldWidth, worldHeight = love.window.getDesktopDimensions(1)
-margin = 5
-px, py = width / 2, height / 2
-ps = 10
-d = nil
-fireTimer = nil
 
 function love.load()
    love.window.setMode(width, height, {borderless = true})
    love.window.setPosition(sx, sy, 1)
-
-   spawnEnemy(love.math.random(0,200),love.math.random(0,200))
 
    fireTimer = 0
    d = 0
 end
 
 function love.update(dt)
-   local centerX = math.floor(width / 2)
-   local centerY = math.floor(height / 2)
-   delta = dt
-
-   love.window.setPosition(sx, sy, 1)
-
    if love.keyboard.isDown("escape") then
       love.event.push('quit')
    end
+   delta = dt
+
+   love.window.setPosition(sx, sy, 1)
    
+   local centerX = math.floor(width / 2)
+   local centerY = math.floor(height / 2)
    if love.keyboard.isDown("d") then
       if math.abs(px - centerX-5) <= margin and sx + width < worldWidth then
          sx = math.min(sx + speed * dt, worldWidth - width)
@@ -87,6 +77,17 @@ function love.update(dt)
    end
 
    updateBullets(dt)
+
+   local text = {
+      str = "LVL: " .. lvl,
+      x = centerX+math.floor(sx),
+      y = 14+math.floor(sy),
+      m = 1000,
+      c = {0,1,1},
+      sm = 1000,
+      sz = 10
+   }
+   texts[1] = text
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -97,13 +98,24 @@ end
 
 function love.draw()
    love.graphics.clear()
+
+   -- draw player & gun --
    love.graphics.setColor(1, 1, 1)
    love.graphics.rectangle("fill", px - 5, py - 5, ps, ps)
    love.graphics.setColor(1, 1, 0)
    love.graphics.arc('line', 'pie', px, py, 20, math.rad(d - bulletSpread), math.rad(d + bulletSpread), 4)
+
+   -- draw entities --
    drawBullets(math.floor(sx), math.floor(sy))
-   drawEnemies(delta)
+   drawEnemies(delta) -- updates too
+   drawText(delta) -- updates too
    drawPlayerHealthbar(px, py-12, health)
+
+   -- draw xp bar --
+   love.graphics.setColor(1, 1, 1)
+   love.graphics.rectangle("fill", math.floor(width/2) - (152 / 2), 4, 152, 4)
+   love.graphics.setColor(0, 0, 1)
+   love.graphics.rectangle("fill", math.floor(width/2)-75, 5, math.floor(xp/math.floor(math.pow(lvl,1.1)+(lvl)*0.1+9)*150), 2)
 
    if debugPrint then
       love.graphics.setColor(0, 1, 0)
@@ -114,5 +126,15 @@ function love.draw()
       love.graphics.print("Y: " .. py, 0, 60)
       love.graphics.print("R: " .. d, 0, 70)
       love.graphics.print("HP: " .. health, 0, 90)
+      love.graphics.print("LV: " .. lvl, 0, 100)
+      love.graphics.print("XP: " .. xp, 0, 110)
+   end
+end
+
+function checkLvlUp()
+   local xpNeeded = math.floor(math.pow(lvl,1.1)+(lvl)*0.1+9)
+   if xp >= xpNeeded then
+      xp = 0
+      lvl = lvl + 1
    end
 end
