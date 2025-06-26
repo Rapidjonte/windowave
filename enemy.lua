@@ -5,7 +5,7 @@ require("bullet")
 
 function spawnEnemy(x, y)
     local minR = 7
-    local maxR = 20
+    local maxR = 16
 
     if (math.random(0, 100) < bigChance) then
         maxR = 50
@@ -38,10 +38,9 @@ function drawEnemies(dt)
             e.health = e.health - bulletDamage
             if e.health <= 0 then
                 local xpGain = math.floor(e.startHealth/300)
-                local textSize = math.min(30,math.floor(e.radius * 1.5))
+                local textSize = math.min(30,math.floor(e.radius)+2)
                 showText("+" .. xpGain .. " XP", e.x, e.y, 1000, {0, 1, 1}, textSize)
                 xp = xp + xpGain * xpMult
-                checkLvlUp()
                 table.remove(enemies, i)
                 goto continue
             end

@@ -8,11 +8,6 @@ require("show_text")
 
 local EnemyIndicator = require("enemy_indicator")
 
-function love.draw()
-    -- draw player, enemies, etc...
-    EnemyIndicator.drawIndicators(enemies, cameraX, cameraY, width, height, px + cameraX, py + cameraY)
-end
-
 local debugPrint = false
 
 function love.load()
@@ -113,13 +108,14 @@ function love.draw()
    love.graphics.arc('line', 'pie', px, py, 20, math.rad(d - bulletSpread), math.rad(d + bulletSpread), 4)
 
    -- draw entities --
-   drawBullets(math.floor(sx), math.floor(sy))
    drawEnemies(delta) -- updates too
+   drawBullets(math.floor(sx), math.floor(sy))
    drawText(delta) -- updates too
    drawPlayerHealthbar(px, py-12, health)
    EnemyIndicator.drawIndicators(enemies, sx, sy, width, height, px + sx, py + sy)
 
    -- draw xp bar --
+   checkLvlUp()
    love.graphics.setColor(1, 1, 1)
    love.graphics.rectangle("fill", math.floor(width/2) - (152 / 2), 4, 152, 4)
    love.graphics.setColor(0, 0, 1)

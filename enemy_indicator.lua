@@ -5,8 +5,8 @@ local function clamp(val, min, max)
 end
 
 function EnemyIndicator.drawIndicators(enemies, cameraX, cameraY, screenWidth, screenHeight, playerX, playerY)
-    local maxIndicatorDistance = 300 
-    local minFadeDistance = math.floor(width/2)
+    local maxIndicatorDistance = 400 
+    local minFadeDistance = math.floor(height/2)
 
     for _, enemy in ipairs(enemies) do
         local ex, ey = enemy.x, enemy.y
@@ -40,8 +40,6 @@ function EnemyIndicator.drawIndicators(enemies, cameraX, cameraY, screenWidth, s
             love.graphics.polygon("fill", cx, cy, x1, y1, x2, y2)
         end
     end
-
-    love.graphics.setColor(1, 1, 1, 1)
 end
 
 return EnemyIndicator
